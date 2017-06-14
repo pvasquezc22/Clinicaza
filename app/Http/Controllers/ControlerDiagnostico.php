@@ -22,9 +22,13 @@ class ControlerDiagnostico extends Controller
     public function index()
     {
         $user = Auth::user();
-        $diagnosticos = Diagnostico::where('user_id', '=', $user->id)
-                                    ->where('estado', '=', 'Terminado')
-                                    ->get();
+        if ($user->tipo_usuario=="Administrador") {
+            $diagnosticos = Diagnostico::all();
+        }else{
+            $diagnosticos = Diagnostico::where('user_id', '=', $user->id)
+                                        ->where('estado', '=', 'Terminado')
+                                        ->get();            
+        }
         return view('diagnostico.index',['diagnosticos' => $diagnosticos]);
     }
 
@@ -69,11 +73,7 @@ class ControlerDiagnostico extends Controller
         if (isset($request->retorno)) {
         	$diagnostico->retorno = $request->retorno;
         }
-        if (isset($request->estado)) {
-            $diagnostico->estado = "Terminado";
-        }else{
-            $diagnostico->estado = "Pendiente";
-        }
+        $diagnostico->estado = "Terminado";
         $diagnostico->save();
         if (isset($request->sintomas)) {
             $diagnostico->sintomas()->sync($request->sintomas, false);

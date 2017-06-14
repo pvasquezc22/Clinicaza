@@ -6,7 +6,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                	<i class="fa fa-user-md"></i> Diagnosticos Pendientes
+                	<i class="fa fa-user-md"></i> Reservas Pendientes
                 	<div class="pull-right">
 						<a href="{{route('diagnostico.create')}}" class="btn btn-primary btn-xs pull-right"> <i class="fa fa-plus-circle"></i> Nuevo</a>
                 	</div>

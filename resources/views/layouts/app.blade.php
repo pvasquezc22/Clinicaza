@@ -80,10 +80,23 @@
                                             <a href="{{route('categoriaSintoma.index')}}"><i class="fa fa-list"></i> Categorias Sintoma</a>
                                         </li>
                                         <li>
-                                            <a href="{{route('tipoAnalisis.index')}}"><i class="fa fa-eyedropper"></i> Analisis Medicos</a>
+                                            <a href="{{route('tipoAnalisis.index')}}"><i class="fa fa-eyedropper"></i> Categorias de examenes</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        <i class="fa fa-sticky-note-o"></i> Examenes complementarios<span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{{route('parametroMedico.index')}}"><i class="fa fa-th-list"></i> Indicadores Analiticos</a>
                                         </li>
                                         <li>
-                                            <a href="{{route('parametroMedico.index')}}"><i class="fa fa-th-list"></i> Parametros Medicos</a>
+                                            <a href="{{route('examenMedico.index')}}"><i class="fa fa-cubes"></i> Examenes Medicos</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{route('examenRealizado.index')}}"><i class="fa fa-briefcase"></i> Examenes Realizados</a>
                                         </li>
                                     </ul>
                                 </li>
@@ -101,12 +114,25 @@
                                         </li>
                                         <li>
                                             <a href="{{route('paciente.index')}}"><i class="fa fa-address-book"></i> Pacientes</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{route('diagnostico.index')}}"><i class="fa fa-medkit"></i> Diagnosticos Registrados</a>
                                         </li>
                                     </ul>
                                 </li>
                             @else
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        <i class="fa fa-sticky-note-o"></i> Examenes complementarios<span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{{route('examenRealizado.index')}}"><i class="fa fa-briefcase"></i> Examenes Realizados</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                         <i class="fa fa-folder"></i> Servicio medico<span class="caret"></span>
                                     </a>
 
@@ -121,7 +147,7 @@
                                             <a href="{{route('paciente.index')}}"><i class="fa fa-address-book"></i> Pacientes</a>
                                         </li>
                                         <li>
-                                            <a href="{{route('diagnostico.pendientes')}}"><i class="fa fa-user-md"></i> Diagnosticos Pendientes</a>
+                                            <a href="{{route('diagnostico.pendientes')}}"><i class="fa fa-user-md"></i> Reservas Pendientes</a>
                                         </li>
                                         <li>
                                             <a href="{{route('diagnostico.index')}}"><i class="fa fa-medkit"></i> Diagnosticos Realizados</a>

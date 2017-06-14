@@ -6,7 +6,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                	<i class="fa fa-edit"></i> Editar Categoria de Sintomas
+                	<i class="fa fa-edit"></i> Editar Indicador Analitico
                 </div>
 
                 <div class="panel-body">

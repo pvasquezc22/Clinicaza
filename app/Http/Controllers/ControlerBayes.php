@@ -80,6 +80,8 @@ class ControlerBayes extends Controller
             $diagnostico = new Diagnostico;
             foreach ($users as $user) {
                 $diagnostico->user_id = $user->id;
+                $nombre_doctor = $user->name;
+                $especialidad_doctor = $user->especialidad->nombre;
             }
             $diagnostico->paciente_id = $request->paciente_id;
             $diagnostico->estado = "Pendiente";
@@ -87,7 +89,7 @@ class ControlerBayes extends Controller
             if (isset($request->sintomas)) {
                 $diagnostico->sintomas()->sync($request->sintomas, false);
             }
-            $informacion = "Reserva realizada";
+            $informacion = "Reserva realizada con el Doctor ".$nombre_doctor." (Especializado en ".$especialidad_doctor.")";
         }else{
             $informacion = "No existen medicos disponibles, para ".$especialidad->nombre." en el turno seleccionado";
         }

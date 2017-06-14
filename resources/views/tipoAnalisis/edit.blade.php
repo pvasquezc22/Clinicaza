@@ -6,7 +6,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                	<i class="fa fa-edit"></i> Editar Analisis
+                	<i class="fa fa-edit"></i> Editar categoria de Examen Complementario
                 </div>
 
                 <div class="panel-body">

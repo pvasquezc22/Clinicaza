@@ -6,7 +6,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                	<i class="fa fa-eyedropper"></i> Analisis Medicos
+                	<i class="fa fa-eyedropper"></i> Categorias de Examenes Complementarios
                 	<div class="pull-right">
 						<a href="{{route('tipoAnalisis.create')}}" class="btn btn-primary btn-xs pull-right"> <i class="fa fa-plus-circle"></i> Nuevo</a>
                 	</div>
