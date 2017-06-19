@@ -31,4 +31,20 @@ class ExamenRealizado extends Model
         return ExamenRealizadoDetalle::where('examen_realizado_id', $this->id)->get();
     }
 
+    public function estado()
+    {
+        return isset($this->diagnostico_id);
+    }
+
+    public function diagnostico()
+    {
+        return $this->belongsTo('App\Diagnostico');
+    }
+
+    public function codigo()
+    {
+        $fecha_examen = explode("-", $this->fecha);
+        return $this->id . "/" . $fecha_examen[0];
+    }
+
 }

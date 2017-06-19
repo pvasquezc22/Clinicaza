@@ -1,62 +1,76 @@
 @extends('layouts.app')
 
+@section('styles')
     {!! Html::style('css/bootstrap-select.min.css') !!}
+@endsection
 
-@section('content')
-<div class="container">
+@section('content')<div class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-edit"></i> Editar Diagnostico
+                    <i class="fa fa-edit"></i> Editar examen medico
+                    <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{route('examenMedico.update',$examen_medico->id)}}">
+                    <form class="form-horizontal" role="form" method="POST" action="{{route('examenRealizado.update',$examen_realizado->id)}}">
+
                         <input name="_method" type="hidden" value="PATCH">
                         {{ csrf_field() }}
 
-                        <div class="form-group{{ ($errors->has('nombre')) ? $errors->first('nombre') : '' }}">
-                            <label for="nombre" class="col-md-4 control-label">Nombre</label>
+                        <div class="form-group{{ ($errors->has('paciente_id')) ? $errors->first('paciente_id') : '' }}">
+                            <label for="paciente_id" class="col-md-4 control-label">Paciente</label>
                             <div class="col-md-6">
-                                <input type="text" name="nombre" id="nombre" class="form-control" value="{{$examen_medico->nombre}}">
-                                {!! $errors->first('nombre','<p class="help-block">:message</p>') !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ ($errors->has('descripcion')) ? $errors->first('descripcion') : '' }}">
-                            <label for="descripcion" class="col-md-4 control-label">Descripcion</label>
-                            <div class="col-md-6">
-                                <textarea type="text" id="descripcion" name="descripcion" class="form-control" placeholder="Ingresa la descripcion aqui" required>{{$examen_medico->descripcion}}</textarea>
-                                {!! $errors->first('descripcion','<p class="help-block">:message</p>') !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ ($errors->has('tipo_analisis_id')) ? $errors->first('tipo_analisis_id') : '' }}">
-                            <label for="tipo_analisis_id" class="col-md-4 control-label">Categoria</label>
-                            <div class="col-md-6">
-                                <select class="form-control selectpicker" name="tipo_analisis_id" id="tipo_analisis_id" data-live-search="true">
-                                    @foreach($tipos_analisis as $tipo_analisis)
-                                        <option value="{{$tipo_analisis->id}}"  {{ ($examen_medico->tipo_analisis_id == $tipo_analisis->id) ? 'selected':'' }} >{{$tipo_analisis->nombre}}</option>
+                                <select class="form-control selectpicker" name="paciente_id" id="paciente_id" data-live-search="true" required>
+                                    @foreach($pacientes as $paciente)
+                                        <option value="{{$paciente->id}}" {{ ($examen_realizado->paciente_id == $paciente->id) ? 'selected':'' }}>{{$paciente->nombre_completo()}}</option>
                                     @endforeach
                                 </select>
-                                {!! $errors->first('tipo_analisis_id','<p class="help-block">:message</p>') !!}
+                                {!! $errors->first('paciente_id','<p class="help-block">:message</p>') !!}
                             </div>
                         </div>
 
-                        <div class="form-group{{ ($errors->has('indicadores')) ? $errors->first('indicadores') : '' }}">
-                            <label for="indicadores" class="col-md-4 control-label">Indicadores</label>
+                        <div class="form-group{{ ($errors->has('fecha')) ? $errors->first('fecha') : '' }}">
+                            <label for="fecha" class="col-md-4 control-label">Fecha</label>
                             <div class="col-md-6">
-                                <select class="form-control selectpicker" name="indicadores[]" id="indicadores" multiple="multiple" data-live-search="true">
-                                    @foreach($parametros_medicos as $indicador)
-                                        <option value="{{$indicador->id}}" 
-                                        @foreach($examen_medico->parametrosMedicos as $parametro)
-                                            {{ ($parametro->id == $indicador->id) ? 'selected':'' }}
-                                        @endforeach
-                                        >{{$indicador->nombre}}</option>
+                                <input type="date" name="fecha" id="fecha" class="form-control" value="{{$examen_realizado->fecha}}" required>
+                                {!! $errors->first('fecha','<p class="help-block">:message</p>') !!}
+                            </div>
+                        </div>
+
+                        <div class="form-group{{ ($errors->has('examenes_medicos_id')) ? $errors->first('examenes_medicos_id') : '' }}">
+                            <label for="examenes_medicos_id" class="col-md-4 control-label">Examen medico</label>
+                            <div class="col-md-6">
+                                <select class="form-control selectpicker" name="examenes_medicos_id" id="examenes_medicos_id" data-live-search="true" onchange="seleccionar_examen_medico(this.value)">
+                                    <option value="0">--Selecciona una opcion--</option>
+                                    @foreach($examenes_medicos as $examen_medico)
+                                        <option value="{{$examen_medico->id}}" {{ ($examen_realizado->examen_medico_id == $examen_medico->id) ? 'selected':'' }}>{{$examen_medico->nombre}}</option>
                                     @endforeach
                                 </select>
-                                {!! $errors->first('indicadores','<p class="help-block">:message</p>') !!}
+                                {!! $errors->first('examenes_medicos_id','<p class="help-block">:message</p>') !!}
                             </div>
+                        </div>
+
+                        <div id="div_parametros_medicos">
+                            @foreach($parametros_medicos as $parametro_medico)
+                                <div class="form-group">
+                                    <label for="parametro_{{$parametro_medico->id}}" class="col-md-4 control-label"> - {{$parametro_medico->nombre}}<br/>   [ {{$parametro_medico->unidad_medida}} ]</label>
+                                    <div class="col-md-6">
+                                        <input type="text" name="parametro_{{$parametro_medico->id}}" id="parametro_{{$parametro_medico->id}}" class="form-control" 
+                                        <?php
+                                            $encontrado = false;
+                                            $aux_valor = 0;
+                                            foreach ($examen_realizado_detalle as $aux) {
+                                                if($aux->parametro_medico_id == $parametro_medico->id){
+                                                    $encontrado = true;
+                                                    $aux_valor = $aux->valor_parametro;
+                                                }
+                                            }
+                                        ?>
+                                        value="{{ $aux_valor }}" required>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                         
                         <div class="form-group">
@@ -82,6 +96,31 @@
 </div>
 @endsection
 
-    {!! Html::script('js/jquery.min.js') !!}
-
+@section('scripts')
     {!! Html::script('js/bootstrap-select.min.js') !!}
+
+        <script type="text/javascript">
+        function seleccionar_examen_medico(examen_medico_id){
+            var aux_html_parametros = '';
+            if(examen_medico_id>0){
+                $.ajax({
+                    type: "POST",
+                    headers: {'X-CSRF-Token':document.getElementById('csrf_token').value},
+                    url: '../parametrosMedicos',
+                    data: { examen_medico_id : examen_medico_id },
+                    success: function( msg ) {
+                        for (var i = 0; i < msg.length; i++) {
+                            var parametro_medico = msg[i];
+                            aux_html_parametros += '<div class="form-group"><label for="parametro_' + parametro_medico['id'] + '" class="col-md-4 control-label"> - ' + parametro_medico['nombre'] + '<br/>   [' + parametro_medico['unidad_medida'] + ']</label><div class="col-md-6"><input type="text" name="parametro_' + parametro_medico['id'] + '" id="parametro_' + parametro_medico['id'] + '" class="form-control" value="0" required></div></div>';
+                        }
+                    },
+                    complete: function(){
+                        $("#div_parametros_medicos").html(aux_html_parametros);                       
+                    }
+                });
+            }else{
+                $("#div_parametros_medicos").html(aux_html_parametros);
+            }
+        }
+    </script>
+@endsection

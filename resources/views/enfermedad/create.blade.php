@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
+@section('styles')
     {!! Html::style('css/bootstrap-select.min.css') !!}
+@endsection
 
 @section('content')
 <div class="container">
@@ -84,6 +86,6 @@
 </div>
 @endsection
 
-    {!! Html::script('js/jquery.min.js') !!}
-
+@section('scripts')
     {!! Html::script('js/bootstrap-select.min.js') !!}
+@endsection

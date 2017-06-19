@@ -11,9 +11,12 @@
     <title>{{ config('app.name', 'Clinica Cochabamba') }}</title>
 
     <!-- Styles -->
-    <link href="/css/app.css" rel="stylesheet">
+    <!--link href="/css/app.css" rel="stylesheet"-->
     <!--link href="{{ asset('css/font-awesome.css') }}" rel="stylesheet" type="text/css"-->
-    {{ Html::style('css/font-awesome.css') }}
+    {!! Html::style('css/app.css') !!}
+    {!! Html::style('css/font-awesome.css') !!}
+
+    @yield('styles')
 
     <!-- Scripts -->
     <script>
@@ -181,8 +184,9 @@
         </nav>
         @yield('content')
     </div>
-
     <!-- Scripts -->
-    <script src="/js/app.js"></script>
+    {!! Html::script('js/app.js') !!}
+    <!--script src="/js/app.js"></script-->
+    @yield('scripts')
 </body>
 </html>

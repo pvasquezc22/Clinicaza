@@ -8,6 +8,7 @@ use App\ParametroMedico;
 use App\ExamenRealizado;
 use App\ExamenMedico;
 use App\Paciente;
+use App\User;
 use Auth;
 use DB;
 
@@ -23,7 +24,13 @@ class ControladorExamenRealizado extends Controller
      */
     public function index()
     {
-        $examenes_realizados = ExamenRealizado::all();
+        $user = Auth::user();
+        if ($user->tipo_usuario=="Administrador") {
+            $examenes_realizados = ExamenRealizado::all();
+        }else{
+            $examenes_realizados = ExamenRealizado::where('user_id', '=', $user->id)
+                                    ->get();
+        }
         return view('examenesRealizados.index',['examenes_realizados' => $examenes_realizados]);
     }
 
@@ -64,11 +71,10 @@ class ControladorExamenRealizado extends Controller
             $examenRealizadoDetalle->examen_realizado_id = $examenRealizado->id;
             $examenRealizadoDetalle->parametro_medico_id = $parametro_medico->id;
             $aux_name_parametro = 'parametro_' . $parametro_medico->id;
-            //dd($request->$aux_name_parametro);
             $examenRealizadoDetalle->valor_parametro = $request['parametro_'.$parametro_medico->id];
             $examenRealizadoDetalle->save();
         }
-        return redirect()->route('examenesRealizados.index')->with('alert-success','Examen medico realizado creado');
+        return redirect()->route('examenRealizado.index')->with('alert-success','Examen realizado creado');
     }
 
     /**
@@ -79,7 +85,14 @@ class ControladorExamenRealizado extends Controller
      */
     public function show($id)
     {
-    	//
+        $examen_realizado = ExamenRealizado::findOrFail($id);
+        $examen_medico = ExamenMedico::findOrFail($examen_realizado->examen_medico_id);
+        $paciente = Paciente::findOrFail($examen_realizado->paciente_id);
+        $user = User::findOrFail($examen_realizado->user_id);
+        $examen_realizado_detalle = ExamenRealizadoDetalle::where('examen_realizado_id', '=', $examen_realizado->id)->get();
+        $aux_parametros = DB::table('examen_parametro')->select('parametro_medico_id')->where('examen_medico_id', '=', $examen_realizado->examen_medico_id);
+        $parametros_medicos = ParametroMedico::whereIn('id', $aux_parametros)->get();
+        return view('examenesRealizados.show',['examen_realizado' => $examen_realizado , 'examen_medico' => $examen_medico , 'paciente' => $paciente , 'user' => $user , 'examen_realizado_detalle' => $examen_realizado_detalle , 'parametros_medicos' => $parametros_medicos]);
     }
 
     /**
@@ -90,10 +103,13 @@ class ControladorExamenRealizado extends Controller
      */
     public function edit($id)
     {
-    	$examen_medico = ExamenMedico::findOrFail($id);
-        $tipos_analisis = TipoAnalisis::all();
-        $parametros_medicos = ParametroMedico::all();
-        return view('examenesMedicos.edit',compact('examen_medico'),['tipos_analisis' => $tipos_analisis , 'parametros_medicos' => $parametros_medicos]);
+        $examen_realizado = ExamenRealizado::findOrFail($id);
+        $examenes_medicos = ExamenMedico::all();
+        $pacientes = Paciente::all();
+        $examen_realizado_detalle = ExamenRealizadoDetalle::where('examen_realizado_id', '=', $examen_realizado->id)->get();
+        $aux_parametros = DB::table('examen_parametro')->select('parametro_medico_id')->where('examen_medico_id', '=', $examen_realizado->examen_medico_id);
+        $parametros_medicos = ParametroMedico::whereIn('id', $aux_parametros)->get();
+        return view('examenesRealizados.edit',compact('examen_realizado'),['examenes_medicos' => $examenes_medicos , 'pacientes' => $pacientes , 'parametros_medicos' => $parametros_medicos , 'examen_realizado_detalle' => $examen_realizado_detalle]);
     }
 
     /**
@@ -105,18 +121,26 @@ class ControladorExamenRealizado extends Controller
      */
     public function update(Request $request, $id)
     {
-        //validation of data
+        $this->validate($request,['paciente_id'=>'required','fecha'=>'required','examenes_medicos_id'=>'required']);
+        $examenRealizado = ExamenRealizado::findOrFail($id);
+        $examenRealizado->paciente_id = $request->paciente_id;
+        $examenRealizado->fecha = $request->fecha;
+        $examenRealizado->examen_medico_id = $request->examenes_medicos_id;
+        $examenRealizado->save();
 
-        $this->validate($request,['nombre'=>'required','descripcion'=>'required','tipo_analisis_id'=>'required']);
-        $examenMedico = ExamenMedico::findOrFail($id);
-        $examenMedico->nombre = $request->nombre;
-        $examenMedico->descripcion = $request->descripcion;
-        $examenMedico->tipo_analisis_id = $request->tipo_analisis_id;
-        $examenMedico->save();
-        if (isset($request->indicadores)) {
-            $examenMedico->parametrosMedicos()->sync($request->indicadores, true);
+        ExamenRealizadoDetalle::where('examen_realizado_id', '=', $id)->delete();
+
+        $aux_parametros = DB::table('examen_parametro')->select('parametro_medico_id')->where('examen_medico_id', '=', $request->examenes_medicos_id);
+        $parametros_medicos = ParametroMedico::whereIn('id', $aux_parametros)->get();
+        foreach ($parametros_medicos as $parametro_medico) {
+            $examenRealizadoDetalle = new ExamenRealizadoDetalle;
+            $examenRealizadoDetalle->examen_realizado_id = $examenRealizado->id;
+            $examenRealizadoDetalle->parametro_medico_id = $parametro_medico->id;
+            $aux_name_parametro = 'parametro_' . $parametro_medico->id;
+            $examenRealizadoDetalle->valor_parametro = $request['parametro_'.$parametro_medico->id];
+            $examenRealizadoDetalle->save();
         }
-        return redirect()->route('examenMedico.index')->with('alert-warning','Examen medico editado');
+        return redirect()->route('examenRealizado.index')->with('alert-warning','Examen realizado editado');
     }
 
     /**
@@ -127,10 +151,10 @@ class ControladorExamenRealizado extends Controller
      */
     public function destroy($id)
     {
-        $examenMedico = ExamenMedico::findOrFail($id);
-        $examenMedico->parametrosMedicos()->sync(array(), true);
-        $examenMedico->delete();
-        return redirect()->route('examenMedico.index')->with('alert-warning','Examen medico eliminado');
+        $examenRealizado = ExamenRealizado::findOrFail($id);
+        ExamenRealizadoDetalle::where('examen_realizado_id', '=', $id)->delete();
+        $examenRealizado->delete();
+        return redirect()->route('examenRealizado.index')->with('alert-warning','Examen realizado eliminado');
     }
 
     public function parametrosMedicos(Request $request)
@@ -138,4 +162,13 @@ class ControladorExamenRealizado extends Controller
         $aux_parametros = DB::table('examen_parametro')->select('parametro_medico_id')->where('examen_medico_id', '=', $request->examen_medico_id);
         return ParametroMedico::whereIn('id', $aux_parametros)->get();
     }
+
+    public function examenesRealizadosPaciente(Request $request)
+    {
+        $examenes_realizados = ExamenRealizado::where('paciente_id', '=', $request->id_paciente)
+                                    ->whereNull('diagnostico_id')
+                                    ->get();
+        return $examenes_realizados;
+    }
+
 }

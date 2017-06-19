@@ -40,4 +40,9 @@ class Diagnostico extends Model
     	return $this->belongsToMany('App\Sintoma');
     }
 
+    public function examenes_realizados()
+    {
+        return $this->hasMany('App\ExamenRealizado');
+    }
+
 }

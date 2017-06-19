@@ -7,9 +7,11 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                 	<i class="fa fa-briefcase"></i> Examenes Realizados
+                	@if ( Auth::user()->tipo_usuario == 'Medico' )
 					<div class="pull-right">
 						<a href="{{route('examenRealizado.create')}}" class="btn btn-primary btn-xs pull-right"> <i class="fa fa-plus-circle"></i> Nuevo</a>
                 	</div>
+                	@endif
                 </div>
 
                 <div class="panel-body">
@@ -18,11 +20,16 @@
 							<tr>
 								<th>No.</th>
 								<th>Paciente</th>
+								<th>Fecha</th>
 								<th>Medico</th>
 								<th>Examen</th>
 								<th>Resultados</th>
+								<th>Estado</th>
+								<th>Ver</th>
+								@if ( Auth::user()->tipo_usuario == 'Medico' )
 								<th>Editar</th>
 								<th>Eliminar</th>
+								@endif
 							</tr>
 						</thead>
 						<tbody>
@@ -31,6 +38,7 @@
 								<tr>
 									<td>{{$num++}}</td>
 									<td>{{$examen_realizado->paciente->nombre_completo()}}</td>
+									<td>{{$examen_realizado->fecha}}</td>
 									<td>{{$examen_realizado->user->name}}</td>
 									<td>{{$examen_realizado->examenMedico->nombre}}<br/>{{$examen_realizado->examenMedico->tipoAnalisis->nombre}}</td>
 									<td>
@@ -41,6 +49,17 @@
 										</div>
 									</td>
 									<td>
+									@if($examen_realizado->estado())
+										Vinculado
+									@else
+										Registrado
+									@endif
+									</td>
+									<td>
+										<a href="{{route('examenRealizado.show',$examen_realizado->id)}}" class="btn btn-success"><i class="fa fa-file-text"></i></a>
+									</td>
+									@if (( Auth::user()->tipo_usuario == 'Medico' ) AND ($examen_realizado->estado() == false))
+									<td>
 										<a href="{{route('examenRealizado.edit',$examen_realizado->id)}}" class="btn btn-warning"><i class="fa fa-edit"></i></a>
 									</td>
 									<td>
@@ -50,7 +69,7 @@
 											<button type="submit" class="btn btn-danger" onclick="return confirm('Esta seguro de eliminar este registro?');"><i class="fa fa-trash"></i></button>
 										</form>
 									</td>
-
+									@endif
 								</tr>
 							@endforeach
 						</tbody>

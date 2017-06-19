@@ -37,6 +37,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('bayes/consulta','ControlerBayes@consulta');
     Route::post('bayes/reserva','ControlerBayes@reserva');
     Route::post('examenRealizado/parametrosMedicos','ControladorExamenRealizado@parametrosMedicos');
+    Route::post('examenRealizado/examenesRealizadosPaciente','ControladorExamenRealizado@examenesRealizadosPaciente');
     Route::resource('tipoAnalisis','ControllerTipoAnalisis');
     Route::resource('parametroMedico','ControlerParametroMedico');
     Route::resource('examenMedico','ControladorExamenMedico');
