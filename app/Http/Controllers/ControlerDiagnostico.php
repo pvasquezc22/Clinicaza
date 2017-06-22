@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\ExamenRealizado;
 use App\Diagnostico;
 use App\Paciente;
 use App\Enfermedad;
@@ -81,6 +82,10 @@ class ControlerDiagnostico extends Controller
         if (isset($request->enfermedades)) {
             $diagnostico->enfermedades()->sync($request->enfermedades, false);
         }
+        if (isset($request->examenesRealizados)) {
+            ExamenRealizado::whereIn('id', $request->examenesRealizados)
+                            ->update(['diagnostico_id' => $diagnostico->id]);
+        }
         return redirect()->route('diagnostico.index')->with('alert-success','Diagnostico creado');
     }
 
@@ -108,7 +113,12 @@ class ControlerDiagnostico extends Controller
         $pacientes = Paciente::all();
         $sintomas = Sintoma::all();
         $enfermedades = Enfermedad::all();
-        return view('diagnostico.edit',compact('diagnostico'),['pacientes' => $pacientes , 'enfermedades' => $enfermedades , 'sintomas' => $sintomas]);
+        $examenes_realizados = ExamenRealizado::where('paciente_id', '=', $diagnostico->paciente_id)
+                                    ->whereNull('diagnostico_id')
+                                    ->orWhere('diagnostico_id', '=', $diagnostico->id)
+                                    ->get();
+        //dd($examenes_realizados);
+        return view('diagnostico.edit',compact('diagnostico'),['pacientes' => $pacientes , 'enfermedades' => $enfermedades , 'sintomas' => $sintomas , 'examenes_realizados' => $examenes_realizados]);
     }
 
     /**
@@ -148,6 +158,11 @@ class ControlerDiagnostico extends Controller
             $diagnostico->enfermedades()->sync(array(), true);
         }
 
+        if (isset($request->examenesRealizados)) {
+            ExamenRealizado::whereIn('diagnostico_id', $id)->update(['diagnostico_id' => null]);
+            ExamenRealizado::whereIn('id', $request->examenesRealizados)->update(['diagnostico_id' => $id]);
+        }
+
         return redirect()->route('diagnostico.index')->with('alert-warning','Diagnostico editado');
     }
 
@@ -162,6 +177,7 @@ class ControlerDiagnostico extends Controller
         $diagnostico = Diagnostico::findOrFail($id);
         $diagnostico->enfermedades()->sync(array(), true);
         $diagnostico->sintomas()->sync(array(), true);
+        ExamenRealizado::whereIn('diagnostico_id', $id)->update(['diagnostico_id' => null]);
         $diagnostico->delete();
         return redirect()->route('diagnostico.index')->with('alert-warning','Diagnostico eliminado');
     }

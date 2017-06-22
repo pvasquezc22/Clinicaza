@@ -11,6 +11,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <i class="fa fa-edit"></i> Editar Diagnostico
+                    <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="POST" action="{{route('diagnostico.update',$diagnostico->id)}}">
@@ -91,6 +92,22 @@
                                 @endif
                             </div>
                         </div>
+
+                        <div class="form-group{{ ($errors->has('examenesRealizados')) ? $errors->first('examenesRealizados') : '' }}">
+                            <label for="examenesRealizados" class="col-md-4 control-label">Examenes Medicos</label>
+                            <div class="col-md-6">
+                                <select class="selectpicker form-control" name="examenesRealizados[]" id="examenesRealizados" multiple="multiple" data-live-search="true">
+                                    @foreach($examenes_realizados as $examen_realizados)
+                                        <option value="{{$examen_realizados->id}}"
+                                        @foreach($diagnostico->examenes_realizados as $aux_examen)
+                                            {{ ($examen_realizados->id == $aux_examen->id) ? 'selected':'' }}
+                                        @endforeach
+                                        >{{$examen_realizados->codigo()}}</option>';
+                                    @endforeach
+                                </select>
+                                {!! $errors->first('examenesRealizados','<p class="help-block">:message</p>') !!}
+                            </div>
+                        </div>
                         
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-3">
@@ -117,4 +134,31 @@
 
 @section('scripts')
     {!! Html::script('js/bootstrap-select.min.js') !!}
+
+    <script type="text/javascript">
+        function buscar_examenes_realizados(id_paciente){
+            var aux_html_opciones = '';
+            if(id_paciente){
+                $.ajax({
+                    type: "POST",
+                    headers: {'X-CSRF-Token':document.getElementById('csrf_token').value},
+                    url: '../../examenRealizado/examenesRealizadosPaciente',
+                    data: { id_paciente : id_paciente },
+                    success: function( msg ) {
+                        for (var i = 0; i < msg.length; i++) {
+                            var examen_realizado = msg[i];
+                            var fecha_examen = examen_realizado.fecha.split("-");
+                            aux_html_opciones += '<option value="' + examen_realizado.id + '">' + examen_realizado.id + '/' + fecha_examen[0] + '</option>';
+                        }
+                    },
+                    complete: function(){
+                        $("#examenesRealizados").html(aux_html_opciones).selectpicker('refresh');
+                    }
+                });
+            }else{
+                $("#examenesRealizados").html(aux_html_opciones).selectpicker('refresh');
+            }
+        }
+    </script>
+
 @endsection

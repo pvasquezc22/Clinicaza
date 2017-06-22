@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('styles')
+    {!! Html::style('css/jquery.dataTables.min.css') !!}
+@endsection
+
 @section('content')
 <div class="container">
     <div class="row">
@@ -15,13 +19,15 @@
                 </div>
 
                 <div class="panel-body">
-					<table class="table table-striped">
+					<table class="table table-striped" id="main-table">
 						<thead>
 							<tr>
 								<th>No.</th>
 								<th>Paciente</th>
 								<th>Fecha</th>
+								@if ( Auth::user()->tipo_usuario == 'Administrador' )
 								<th>Medico</th>
+								@endif
 								<th>Examen</th>
 								<th>Resultados</th>
 								<th>Estado</th>
@@ -39,11 +45,13 @@
 									<td>{{$num++}}</td>
 									<td>{{$examen_realizado->paciente->nombre_completo()}}</td>
 									<td>{{$examen_realizado->fecha}}</td>
+									@if ( Auth::user()->tipo_usuario == 'Administrador' )
 									<td>{{$examen_realizado->user->name}}</td>
+									@endif
 									<td>{{$examen_realizado->examenMedico->nombre}}<br/>{{$examen_realizado->examenMedico->tipoAnalisis->nombre}}</td>
 									<td>
 										<div class="sintomas">
-										@foreach($examen_realizado->examenRealizadoDetalle() as $parametro_detalle)
+										@foreach($examen_realizado->examenRealizadoDetalle as $parametro_detalle)
 											<span class="label label-default">{{$parametro_detalle->parametroMedico->nombre}} : {{$parametro_detalle->valor_parametro}}</span><br/>
 										@endforeach
 										</div>
@@ -69,6 +77,9 @@
 											<button type="submit" class="btn btn-danger" onclick="return confirm('Esta seguro de eliminar este registro?');"><i class="fa fa-trash"></i></button>
 										</form>
 									</td>
+									@elseif ( Auth::user()->tipo_usuario == 'Medico' )
+										<td>-</td>
+										<td>-</td>
 									@endif
 								</tr>
 							@endforeach
@@ -79,4 +90,19 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+
+    {!! Html::script('js/jquery.dataTables.min.js') !!}
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+        	$('#main-table').DataTable({
+		        processing: true,
+		        serverSide: false
+		    });
+        });
+    </script>
+
 @endsection

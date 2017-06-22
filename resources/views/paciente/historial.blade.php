@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
+@section('styles')
+    {!! Html::style('css/jquery.dataTables.min.css') !!}
+@endsection
+
 @section('content')
+
 <div class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
@@ -37,7 +42,7 @@
                     <i class="fa fa-file-text"></i> Historial medico
                 </div>
                 <div class="panel-body">
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="main-table">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -84,4 +89,19 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+
+    {!! Html::script('js/jquery.dataTables.min.js') !!}
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#main-table').DataTable({
+                processing: true,
+                serverSide: false
+            });
+        });
+    </script>
+
 @endsection

@@ -28,7 +28,8 @@ class ExamenRealizado extends Model
 
 	public function examenRealizadoDetalle()
     {
-        return ExamenRealizadoDetalle::where('examen_realizado_id', $this->id)->get();
+        return $this->hasMany('App\ExamenRealizadoDetalle');
+        //return ExamenRealizadoDetalle::where('examen_realizado_id', $this->id)->get();
     }
 
     public function estado()
