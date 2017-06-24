@@ -159,7 +159,7 @@ class ControlerDiagnostico extends Controller
         }
 
         if (isset($request->examenesRealizados)) {
-            ExamenRealizado::whereIn('diagnostico_id', $id)->update(['diagnostico_id' => null]);
+            ExamenRealizado::whereIn('diagnostico_id', explode(',', $id))->update(['diagnostico_id' => null]);
             ExamenRealizado::whereIn('id', $request->examenesRealizados)->update(['diagnostico_id' => $id]);
         }
 
